@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Prueba geolocalizacion</title>
+	<meta charset="UTF-8">
+	<script src="jquery.js"></script>
+	<script src="modernizr.min.js"></script>
+	<script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLqgXjDUtT4tN9on-IcYYdEFa2htF5gNg">
+	</script>
+	<style type="text/css">
+		html {
+			height: 100%;
+		}
+
+		body {
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+		}
+
+		#resultado {
+			height: 100%;
+			width: 100%;
+		}
+	</style>
+	<script>
+		//Mas ejemplos en http://hpneo.github.io/gmaps/ 
+   		//Mas aun en http://hpneo.github.io/gmpas/examples.html
+	    $(document).ready(function(){
+	    	var mapa = null;
+	    	var mapaMarcador = null;
+
+	       if(Modernizr.geolocation){
+	           
+	           navigator.geolocation.watchPosition(mostrarCoordenadas, mostrarErrores,
+	           { maximumAge:1000,timeout:300000,enableHighAccuracy:true } );
+	           
+	           //tiempo de monitoreo maximumAge, cada 1 seg
+	           //tiempo si no hay conexion timeout, si en 3 min nada, a la puta
+	          
+	        }else{
+	           alert("no soporta geolocalizacion");
+	           return;
+	       }
+	       
+	       function mostrarCoordenadas(posicion){
+	    	   
+	           var latitud = posicion.coords.latitude;
+	           var longitud = posicion.coords.longitude;
+	           
+	           var gmPosicion = new google.maps.LatLng(latitud,longitud);
+
+	           if(mapa == null){
+	           	 var opciones = {center:gmPosicion, zoom:15, mapTypeId:google.maps.MapTypeId.ROADMAP};
+	           	 mapa = new google.maps.Map(document.getElementById("resultado"), opciones);
+	           	 mapaMarcador = new google.maps.Marker({ position:gmPosicion, title:"Estas aqui!\n Latitud: "+latitud+"\n Longitud:"+longitud});
+	           	 
+	           	 mapaMarcador.setMap(mapa);
+	           
+	           }else{
+
+	           	 mapa.panTo(gmPosicion);
+	           	 mapaMarcador.setPosition(gmPosicion);
+	           
+	           }
+	          
+	       }
+	       
+	       
+	       function mostrarErrores(error){
+	           switch(error.code){
+	               case error.PERMISSION_DENIED:
+	                   alert("Permiso denegado por el usuario");
+	                   break;
+	               case error.POSITION_UNAVAILABLE:
+	                   alert("Posicion no disponible");
+	                   break;
+	               case error.TIMEOUT:
+	                   alert("Tiempo de espera agotado");
+	               default:
+	                   alert("Error desconocido de Geolocalizacion: "+error.code);
+	           }
+	       }
+	       
+	    });
+	</script>
+</head>
+
+<body>
+	<div id="resultado"></div>
+</body>
+
+</html>
